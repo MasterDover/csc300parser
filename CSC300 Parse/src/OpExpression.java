@@ -1,15 +1,14 @@
-public class OpExpression
-
+public class OpExpression 
 {
 	private char theOp;
 	
-	public OpExpression()
+	public OpExpression(char theOp)
 	{
-		
+		this.theOp = theOp;
 	}
 	
-	public void add(char c)
+	public String toString()
 	{
-		theOp = c;
+		return "" + theOp;
 	}
 }

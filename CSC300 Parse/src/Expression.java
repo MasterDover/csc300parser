@@ -1,9 +1,4 @@
+public abstract class Expression 
+{
 
-public abstract class Expression {
-	
-	public void add(String s)
-	{
-		
-	}
-	
 }

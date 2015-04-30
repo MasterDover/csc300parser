@@ -1,36 +1,21 @@
-public class VarDefStatement 
-
+public class VarDefStatement extends Object
 {
-	private VarExpression theVarExpr = null;
-	private MathExpression theMathExpr = null;
-
-	public VarDefStatement()
+	private VarExpression theVarExpr;
+	private MathExpression theMathExpr;
+	
+	public VarDefStatement(VarExpression theVarExpr, MathExpression theMathExpr)
 	{
+		this.theVarExpr = theVarExpr;
+		this.theMathExpr = theMathExpr;
 	}
 	
-	public void add(String s, boolean isMathExpression)
+	public String toString()
 	{
-		if(theVarExpr == null)
-		{
-			theVarExpr = new VarExpression();
-			theMathExpr = new MathExpression();
-			theVarExpr.add(s);
-		}
-		else
-		{
-			if(isMathExpression)
-			{
-				theMathExpr.add(isMathExpression);
-			}
-			else
-			{
-				theMathExpr.add(s);
-			}
-		}
+		//write this such that it rebuilds the String version
+		//of the original statement.  You MAY NOT just use the
+		//store string variable theStmt.
 		
-	}
-	public void add(char c)
-	{
-		theMathExpr.add(c);
+		
+		return theVarExpr.toString() + "=" + theMathExpr.toString() + ";";
 	}
 }

@@ -1,81 +1,26 @@
 public class MathExpression extends Expression
 {
-
-	private VarExpression leftOperand = null;
-	private MathExpression leftOperandMath = null;
-	private VarExpression rightOperand = null;
-	private MathExpression rightOperandMath = null;
-	private OpExpression operator = null;
-	private boolean isLeft;
-	private boolean isRight;
-
-	public MathExpression()
+	private Expression leftOperand;
+	private Expression rightOperand;
+	private OpExpression operator;
+	
+	public MathExpression(Expression leftOperand, Expression rightOperand, OpExpression operator)
 	{
+		this.leftOperand = leftOperand;
+		this.rightOperand = rightOperand;
+		this.operator = operator;
 	}
-
-	public void add(String s)
+	
+	public String toString()
 	{
-		if(operator == null)
+		if(leftOperand instanceof MathExpression)
 		{
-			if(isLeft)
-			{
-				leftOperandMath = new MathExpression();
-				leftOperandMath.add(s);
-			}
-			else
-			{
-				leftOperand = new VarExpression();
-				leftOperand.add(s);
-			}
+			return "(" + leftOperand.toString() + ")" + operator.toString() + rightOperand.toString();
 		}
-		else
+		if(rightOperand instanceof MathExpression)
 		{
-			if(isRight)
-			{
-				rightOperandMath = new MathExpression();
-				rightOperandMath.add(s);
-			}
-			else
-			{
-				rightOperand = new VarExpression();
-				rightOperand.add(s);
-			}
+			return leftOperand.toString() + operator.toString() + "(" + rightOperand.toString() + ")";
 		}
-
+		return leftOperand.toString() + operator.toString()+ rightOperand.toString();
 	}
-
-	public void add(boolean b)
-	{
-		if(operator == null)
-		{
-			isLeft = b;
-		}
-		else
-		{
-			isRight = b;
-		}
-	}
-
-	public void add(char c)
-	{
-		if(operator == null)
-		{
-			if(isLeft)
-			{
-				leftOperandMath.add(c);
-			}
-			else
-			{
-				operator = new OpExpression();
-				operator.add(c);
-			}
-		}
-		else
-		{
-			rightOperandMath.add(c);
-		}
-
-	}
-
-
 }

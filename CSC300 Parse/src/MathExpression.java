@@ -11,16 +11,60 @@ public class MathExpression extends Expression
 		this.operator = operator;
 	}
 	
+	public int doMath()
+	{
+		int theLeftNum;
+		int theRightNum;
+		if(this.leftOperand instanceof VarExpression)
+		{
+			//hw crap here
+			theLeftNum = -1;
+		}
+		else if(this.leftOperand instanceof LitExpression)
+		{
+			theLeftNum = ((LitExpression) this.leftOperand).getTheLiteral();
+		} 
+		else
+		{
+			theLeftNum = ((MathExpression)this.leftOperand).doMath();
+		}
+		
+		if(this.rightOperand instanceof VarExpression)
+		{
+			//hw crap here
+			theRightNum = -1;
+		}
+		else if(this.rightOperand instanceof LitExpression)
+		{
+			theRightNum = ((LitExpression) this.rightOperand).getTheLiteral();
+		} 
+		else
+		{
+			theRightNum = ((MathExpression)this.rightOperand).doMath();
+		}
+		return this.operator.applyOperator(theLeftNum, theRightNum);
+	}
+	
 	public String toString()
 	{
-		if(leftOperand instanceof MathExpression)
+		String result = "";
+		if(this.leftOperand instanceof MathExpression)
 		{
-			return "(" + leftOperand.toString() + ")" + operator.toString() + rightOperand.toString();
+			result += "(" + this.leftOperand.toString() + ")";
 		}
-		if(rightOperand instanceof MathExpression)
+		else
 		{
-			return leftOperand.toString() + operator.toString() + "(" + rightOperand.toString() + ")";
+			result += this.leftOperand.toString();
 		}
-		return leftOperand.toString() + operator.toString()+ rightOperand.toString();
+		result += this.operator.toString();
+		if(this.rightOperand instanceof MathExpression)
+		{
+			result += "(" + this.rightOperand.toString() + ")";
+		}
+		else
+		{
+			result += this.rightOperand.toString();
+		}
+		return result;
 	}
 }

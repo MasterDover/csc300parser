@@ -1,18 +1,24 @@
+import java.util.LinkedList;
+
 public class Parser 
 {
 	private String theStmt;
 	private int pos; //where am I in the theStmt string
 	private static final String legalVariableCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "; 
+	private static final String legalLiteralCharacter = "0123456789 ";
+	private static final String legalSymbolCharacters = Parser.legalVariableCharacters + Parser.legalLiteralCharacter;
 	private static final String legalOpCharacters = "+-*/% ";
 	private VarDefStatement theSytaxTree;
-	
+	private LinkedList variableList;
+
 	public Parser(String theStmt)
 	{
 		this.theStmt = theStmt;
 		this.theSytaxTree = null;
+		this.variableList = null;
 		this.pos = 0;
 	}
-	
+
 	public VarDefStatement getTheSytaxTree() {
 		return theSytaxTree;
 	}
@@ -21,7 +27,7 @@ public class Parser
 	{
 		this.theSytaxTree = this.parse_stmt();
 	}
-	
+
 	private String getNextToken(char c)
 	{
 		while(pos < this.theStmt.length())
@@ -35,7 +41,7 @@ public class Parser
 		}
 		return "" + c;
 	}
-	
+
 	private String getNextToken(String legalChars)
 	{
 		String token = "";
@@ -56,7 +62,7 @@ public class Parser
 		}
 		return token.trim();
 	}
-	
+
 	private VarDefStatement parse_stmt()
 	{
 		//Print each time it reads something like:
@@ -64,29 +70,74 @@ public class Parser
 		String varName = this.getNextToken(Parser.legalVariableCharacters);
 		System.out.println("Read VarName: " + varName);
 		VarExpression theVE = new VarExpression(varName);
-		
+
 		//burn past the =
 		this.getNextToken('=');
 		System.out.println("Burned =");
-		
+
+		String possibleVariable = Parser.legalLiteralCharacter;
+
+		if(isVariable(this.getNextToken( possibleVariable + ";")))
+		{
+			int variableNum;
+			variableNum = Integer.parseInt(possibleVariable);
+			Variable theVariable = new Variable(varName, variableNum);
+
+			variableList.add(theVariable);
+			return this.parse_stmt();
+		}
+
+
+
 		// Reading: Math-Expr
 		MathExpression theME = this.parse_math_expr();
-		
+		System.out.println("The Right Side Math is: " + theME.doMath());
+
 		//burn past the ;
 		this.getNextToken(';');
 		System.out.println("Burned ;");
-		
+
 		return new VarDefStatement(theVE, theME);
 	}
-	
+
+	private boolean isVariable(String symbol)
+	{
+		//symbol = symbol.trim();
+		for(int i = 0; i < symbol.length(); i++)
+		{
+			if(Parser.legalLiteralCharacter.indexOf(symbol.charAt(i)) == -1 || symbol.charAt(i) == ' ')
+			{
+				return false;
+			}
+		}
+
+		if(symbol.endsWith(";"))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isVarExpression(String symbol)
+	{
+		for(int i = 0; i < symbol.length(); i++)
+		{
+			if(Parser.legalVariableCharacters.indexOf(symbol.charAt(i)) == -1 || symbol.charAt(i) == ' ')
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private MathExpression parse_math_expr()
 	{
-		String varName = this.getNextToken(Parser.legalVariableCharacters);
+		String symbol = this.getNextToken(Parser.legalSymbolCharacters);
 		Expression leftOperand = null;
 		Expression rightOperand = null;
 		OpExpression theOpExpression = null;
-		
-		if(varName.length() == 0)
+
+		if(symbol.length() == 0)
 		{
 			//we know that we are at the beginning of a paren-math-expr
 			this.getNextToken('(');
@@ -97,15 +148,24 @@ public class Parser
 		}
 		else
 		{
-			System.out.println("Read VarName: " + varName);
-			leftOperand = new VarExpression(varName);
+			//is it a var or a lit expression?
+			if(this.isVarExpression(symbol))
+			{
+				System.out.println("Read VarExpression: " + symbol);
+				leftOperand = new VarExpression(symbol);
+			}
+			else
+			{
+				System.out.println("Read LitExpression: " + symbol);
+				leftOperand = new LitExpression(Integer.parseInt(symbol));
+			}
 		}
 		String op = this.getNextToken(Parser.legalOpCharacters);
 		System.out.println("Read Op: " + op);
 		theOpExpression = new OpExpression(op.charAt(0));
-		
-		varName = this.getNextToken(Parser.legalVariableCharacters);
-		if(varName.length() == 0)
+
+		symbol = this.getNextToken(Parser.legalSymbolCharacters);
+		if(symbol.length() == 0)
 		{
 			//we know that we are at the beginning of a paren-math-expr
 			this.getNextToken('(');
@@ -114,8 +174,17 @@ public class Parser
 		}
 		else
 		{
-			System.out.println("Read VarName: " + varName);
-			rightOperand = new VarExpression(varName);
+			//is it a var or a lit expression?
+			if(this.isVarExpression(symbol))
+			{
+				System.out.println("Read VarExpression: " + symbol);
+				rightOperand = new VarExpression(symbol);
+			}
+			else
+			{
+				System.out.println("Read LitExpression: " + symbol);
+				rightOperand = new LitExpression(Integer.parseInt(symbol));
+			}
 		}
 		return new MathExpression(leftOperand, rightOperand, theOpExpression);
 	}
